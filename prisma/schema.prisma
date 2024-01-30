@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  username  String
+  password  String
+  email     String?  @unique
+  name      String
+  sex       SexEnum
+  address   String
+  phone     String
+  birthdate DateTime
+  Order     Order[]
+}
+
+enum SexEnum {
+  MALE
+  FEMALE
+  PREFER_NOT_TO_SAY
+}
+
+model Restaurant {
+  id      Int            @id @default(autoincrement())
+  name    String
+  address String
+  phone   String
+  type    RestaurantType
+  Menu    Menu[]
+}
+
+enum RestaurantType {
+  THAI
+  JAPANESE
+  ITALIAN
+  CHINESE
+  KOREAN
+}
+
+model Menu {
+  id           Int           @id @default(autoincrement())
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId   Int           @map("category_id")
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId Int           @map("restaurant_id")
+  product      String
+  price        Decimal
+  OrderDetail  OrderDetail[]
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+  Menu Menu[]
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId       Int      @map("order_id")
+  paymentMethod String
+  amount        Decimal
+  datetime      DateTime
+}
+
+model Order {
+  id              Int           @id @default(autoincrement())
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  customerId      Int           @map("customer_id")
+  status          String
+  datetime        DateTime
+  deliveryAddress String
+  paymentMethod   String
+  paymentAmount   Decimal
+  paymentDatetime DateTime
+  Payment         Payment[]
+  OrderDetail     OrderDetail[]
+}
+
+model OrderDetail {
+  id       Int     @id @default(autoincrement())
+  menu     Menu    @relation(fields: [menuId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  menuId   Int     @map("menu_id")
+  order    Order   @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId  Int     @map("order_id")
+  quantity Int
+  total    Decimal
+  notes    String?
+}
