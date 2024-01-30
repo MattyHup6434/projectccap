@@ -7,17 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Search {
+  id   Int    @id @default(autoincrement())
+  name String
+  customerSearch customerSearch[]
+}
+
+model customerSearch {
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  customerId Int      @map("customer_id")
+  search     Search   @relation(fields: [searchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  searchId   Int      @map("search_id")
+}
+
 model Customer {
-  id        Int      @id @default(autoincrement())
-  username  String
-  password  String
-  email     String?  @unique
-  name      String
-  sex       SexEnum
-  address   String
-  phone     String
-  birthdate DateTime
-  Order     Order[]
+  id             Int              @id @default(autoincrement())
+  username       String
+  password       String
+  email          String?          @unique
+  name           String
+  sex            SexEnum
+  address        String
+  phone          String
+  birthdate      DateTime
+  Order          Order[]
+  customerSearch customerSearch[]
 }
 
 enum SexEnum {
