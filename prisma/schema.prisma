@@ -8,17 +8,19 @@ datasource db {
 }
 
 model Search {
-  id   Int    @id @default(autoincrement())
-  name String
-  customerSearch customerSearch[]
+  id                  Int              @id @default(autoincrement())
+  name                String
+  customerSearch      customerSearch[]
+  searchedRestaurants Restaurant[]
 }
 
 model customerSearch {
-  id         Int      @id @default(autoincrement())
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  customerId Int      @map("customer_id")
-  search     Search   @relation(fields: [searchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  searchId   Int      @map("search_id")
+  id            Int      @id @default(autoincrement())
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  customerId    Int      @map("customer_id")
+  search        Search   @relation(fields: [searchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  searchId      Int      @map("search_id")
+  searchedMenus Menu[]
 }
 
 model Customer {
@@ -42,12 +44,14 @@ enum SexEnum {
 }
 
 model Restaurant {
-  id      Int            @id @default(autoincrement())
-  name    String
-  address String
-  phone   String
-  type    RestaurantType
-  Menu    Menu[]
+  id       Int            @id @default(autoincrement())
+  name     String
+  address  String
+  phone    String
+  type     RestaurantType
+  Menu     Menu[]
+  Search   Search?        @relation(fields: [searchId], references: [id])
+  searchId Int?
 }
 
 enum RestaurantType {
@@ -59,14 +63,16 @@ enum RestaurantType {
 }
 
 model Menu {
-  id           Int           @id @default(autoincrement())
-  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId   Int           @map("category_id")
-  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  restaurantId Int           @map("restaurant_id")
-  product      String
-  price        Decimal
-  OrderDetail  OrderDetail[]
+  id               Int             @id @default(autoincrement())
+  category         Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId       Int             @map("category_id")
+  restaurant       Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  restaurantId     Int             @map("restaurant_id")
+  product          String
+  price            Decimal
+  OrderDetail      OrderDetail[]
+  customerSearch   customerSearch? @relation(fields: [customerSearchId], references: [id])
+  customerSearchId Int?
 }
 
 model Category {
